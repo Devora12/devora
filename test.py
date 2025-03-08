@@ -16,6 +16,8 @@ response = requests.get(api_url, auth=HTTPBasicAuth(USERNAME, APP_PASSWORD))
 if response.status_code == 200:
     commits = response.json()["values"]
 
+    
+
     # Initialize a list to store commit details in JSON format
     commit_data = []
 
