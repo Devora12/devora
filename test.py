@@ -13,9 +13,9 @@ api_url = f"https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{REPO_SLUG}/c
 
 # Fetch data from API
 response = requests.get(api_url, auth=HTTPBasicAuth(USERNAME, APP_PASSWORD))
-
 if response.status_code == 200:
-    
+   
+
     commits = response.json()["values"]
 
     # Initialize a list to store commit details in JSON format
@@ -46,22 +46,22 @@ if response.status_code == 200:
             lines_deleted = sum(item.get("lines_removed", 0) for item in diff_data)
             total_changes = lines_added + lines_deleted
 
-            # Check if changes are superficial (same code added and removed)
-            superficial_change = False
-            for item in diff_data:
-                # Ensure 'old' and 'new' keys exist in the item
-                old_code = ""
-                new_code = ""
+            # Track removed and added lines to detect superficial changes
+            removed_lines = []
+            added_lines = []
 
+            for item in diff_data:
                 # Safely check for 'old' and 'new' keys and their 'lines' values
                 if item.get("old") is not None and "lines" in item["old"]:
-                    old_code = item["old"]["lines"]
+                    removed_lines.extend(item["old"]["lines"])
 
                 if item.get("new") is not None and "lines" in item["new"]:
-                    new_code = item["new"]["lines"]
+                    added_lines.extend(item["new"]["lines"])
 
-                # Compare the lines of code
-                if old_code.strip() == new_code.strip() and old_code.strip() != "":
+            # Check for superficial changes (removed code added back in a different line)
+            superficial_change = False
+            for removed_line in removed_lines:
+                if removed_line.strip() in added_lines:
                     superficial_change = True
                     break
 
