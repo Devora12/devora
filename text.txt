@@ -1,0 +1,125 @@
+import requests
+import csv
+from requests.auth import HTTPBasicAuth
+
+# Replace with your Bitbucket credentials
+USERNAME = "your_username"
+APP_PASSWORD = "your_app_password"
+WORKSPACE = "your_workspace"
+REPO_SLUG = "your_repo_slug"
+
+# Bitbucket API URL for commits
+commits_url = f"https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{REPO_SLUG}/commits"
+
+# Make the request
+response = requests.get(commits_url, auth=HTTPBasicAuth(USERNAME, APP_PASSWORD))
+
+if response.status_code == 200:
+    commits = response.json()["values"]
+
+    # Open a CSV file for writing
+    with open("commits.csv", mode="w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+
+        # Write the header row
+        writer.writerow(["Commit Hash", "Author Name", "Author Email", "Date", "Message"])
+
+        # Write commit details
+        for commit in commits:
+            commit_hash = commit["hash"]
+            author_raw = commit["author"]["raw"]  # Format: "John Doe <john.doe@example.com>"
+            date = commit["date"]
+            message = commit["message"]
+
+            # Extracting Name & Email separately
+            if "<" in author_raw and ">" in author_raw:
+                author_name = author_raw.split("<")[0].strip()
+                author_email = author_raw.split("<")[1].replace(">", "").strip()
+            else:
+                author_name = author_raw
+                author_email = "Not Available"
+
+            writer.writerow([commit_hash, author_name, author_email, date, message])
+
+    print("✅ Commit data has been exported to commits.csv")
+
+else:
+    print("❌ Error Fetching Commits:", response.status_code, response.text)
+
+
+
+
+CSV superficial
+
+import requests
+import csv
+from requests.auth import HTTPBasicAuth
+
+# Replace with your Bitbucket credentials
+USERNAME = "your_username"
+APP_PASSWORD = "your_app_password"
+WORKSPACE = "your_workspace"
+REPO_SLUG = "your_repo_slug"
+
+# API URLs
+COMMITS_URL = f"https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{REPO_SLUG}/commits"
+
+# Fetch commits
+response = requests.get(COMMITS_URL, auth=HTTPBasicAuth(USERNAME, APP_PASSWORD))
+
+if response.status_code == 200:
+    commits = response.json()["values"]
+
+    # Open a CSV file for writing
+    with open("commit_productivity.csv", mode="w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+
+        # Write header row
+        writer.writerow(["Commit Hash", "Author", "Email", "Date", "Message", "Lines Added", "Lines Deleted", "Total Changes", "Superficial Change?"])
+
+        for commit in commits:
+            commit_hash = commit["hash"]
+            author_raw = commit["author"]["raw"]  # Format: "John Doe <john.doe@example.com>"
+            date = commit["date"]
+            message = commit["message"]
+
+            # Extract Name & Email
+            if "<" in author_raw and ">" in author_raw:
+                author_name = author_raw.split("<")[0].strip()
+                author_email = author_raw.split("<")[1].replace(">", "").strip()
+            else:
+                author_name = author_raw
+                author_email = "Not Available"
+
+            # Fetch commit diff to get lines added/deleted
+            diff_url = f"https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{REPO_SLUG}/diffstat/{commit_hash}"
+            diff_response = requests.get(diff_url, auth=HTTPBasicAuth(USERNAME, APP_PASSWORD))
+
+            if diff_response.status_code == 200:
+                diff_data = diff_response.json()["values"]
+
+                lines_added = sum(item.get("lines_added", 0) for item in diff_data)
+                lines_deleted = sum(item.get("lines_removed", 0) for item in diff_data)
+                total_changes = lines_added + lines_deleted
+
+                # Check if changes are superficial (same code added and removed)
+                superficial_change = False
+                for item in diff_data:
+                    # Fetch the actual diff content
+                    old_code = item.get("old", "").strip()
+                    new_code = item.get("new", "").strip()
+
+                    if old_code == new_code and old_code != "":
+                        superficial_change = True
+                        break
+
+                # Write to CSV
+                writer.writerow([commit_hash, author_name, author_email, date, message, lines_added, lines_deleted, total_changes, "Yes" if superficial_change else "No"])
+
+            else:
+                print(f"⚠️ Could not fetch diff for commit {commit_hash}")
+
+    print("✅ Commit productivity and superficial change detection data saved to commit_productivity.csv")
+
+else:
+    print("❌ Error Fetching Commits:", response.status_code, response.text)
