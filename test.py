@@ -13,6 +13,9 @@ api_url = f"https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{REPO_SLUG}/c
 
 # Fetch data from API
 response = requests.get(api_url, auth=HTTPBasicAuth(USERNAME, APP_PASSWORD))
+
+
+
 if response.status_code == 200:
     commits = response.json()["values"]
     commit_data = []  # List to store commit details
