@@ -9,8 +9,7 @@ WORKSPACE = "slttest1"
 REPO_SLUG = "test1"
 
 # API endpoint to get commits
-API_URL = f"https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{REPO_SLUG}/commits"
-
+API_URL = f"https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{REPO_SLUG}/commits?pagelen=2"
 
 response = requests.get(API_URL, auth=HTTPBasicAuth(USERNAME, APP_PASSWORD))
 
@@ -40,9 +39,9 @@ if response.status_code == 200:
             diff_data = diff_response.json()["values"]
             
             # Calculate basic metrics
-            lines_added = sum(item.get("lines_added", 0) for item in diff_data)
-            lines_deleted = sum(item.get("lines_removed", 0) for item in diff_data)
-            total_changes = lines_added + lines_deleted
+            # lines_added = sum(item.get("lines_added", 0) for item in diff_data)
+            # lines_deleted = sum(item.get("lines_removed", 0) for item in diff_data)
+            # total_changes = lines_added + lines_deleted
 
             # Get raw diff content
             raw_diff_url = f"https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{REPO_SLUG}/diff/{commit_hash}"
@@ -66,23 +65,23 @@ if response.status_code == 200:
                         removed_code.append(line[1:])  # Remove '-' prefix
 
             # Quality analysis
-            stripped_removed = set(line.strip() for line in removed_code)
-            stripped_added = set(line.strip() for line in added_code)
-            superficial_lines = len(stripped_removed.intersection(stripped_added))
+            # stripped_removed = set(line.strip() for line in removed_code)
+            # stripped_added = set(line.strip() for line in added_code)
+            # superficial_lines = len(stripped_removed.intersection(stripped_added))
             
-            whitespace_lines = sum(
-                1 for line in removed_code + added_code 
-                if not line.strip()
-            )
+            # whitespace_lines = sum(
+            #     1 for line in removed_code + added_code 
+            #     if not line.strip()
+            # )
 
             # Meaningfulness check
-            is_meaningful = True
-            if total_changes < 5:
-                is_meaningful = False
-            elif (superficial_lines / total_changes) > 0.5 if total_changes > 0 else False:
-                is_meaningful = False
-            elif (whitespace_lines / total_changes) > 0.5 if total_changes > 0 else False:
-                is_meaningful = False
+            # is_meaningful = True
+            # if total_changes < 5:
+            #     is_meaningful = False
+            # elif (superficial_lines / total_changes) > 0.5 if total_changes > 0 else False:
+            #     is_meaningful = False
+            # elif (whitespace_lines / total_changes) > 0.5 if total_changes > 0 else False:
+            #     is_meaningful = False
 
             # Collect commit data
             commit_data.append({
@@ -91,18 +90,18 @@ if response.status_code == 200:
                 "author_email": author_email,
                 "date": date,
                 "message": message,
-                "lines_added": lines_added,
-                "lines_deleted": lines_deleted,
-                "total_changes": total_changes,
+                # "lines_added": lines_added,
+                # "lines_deleted": lines_deleted,
+                # "total_changes": total_changes,
                 "code_changes": {
                     "added": added_code,
                     "removed": removed_code
                 },
-                "quality_metrics": {
-                    "superficial_lines": superficial_lines,
-                    "whitespace_lines": whitespace_lines,
-                    "is_meaningful": is_meaningful
-                }
+                # "quality_metrics": {
+                #     "superficial_lines": superficial_lines,
+                #     "whitespace_lines": whitespace_lines,
+                #     "is_meaningful": is_meaningful
+                # }
             })
 
         else:
