@@ -10,7 +10,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 WORKSPACE = "slttest1"  # Replace with your workspace
 REPO_SLUG = "test1"     # Replace with your repository slug
 ACCESS_TOKEN = "ATCTT3xFfGN0CFPRsEATPT8GgX-PamvnKrGFjqXKyCC8ZN0ZI2pnsBUS7-7J0Ig1dposHf6UOsHabOffY360mK3z3kOu7iVd0RZxX94s_UK0KqJGO2oGj-ijJChO_c234MsA_0dBNmCInQuS_NSjFb9x83buMcJMCtqbCylR0iGHU5vuH_Ba_9g=676CC7D2"  # Replace with your token
-USER_EMAIL = "2021t01245@stu.cmb.ac.lk"  # Replace with the user's email
+USER_EMAIL = "sewminiweerakkody1004@gmail.com"  # Replace with the user's email
 
 # OpenRouter API details
 OPENROUTER_API_KEY = "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"  # Replace with your OpenRouter API key
