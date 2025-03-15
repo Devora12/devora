@@ -1,6 +1,7 @@
 import sys
 import requests
 import json
+from openai import OpenAI
 
 # Set the console encoding to UTF-8
 sys.stdout.reconfigure(encoding='utf-8')
@@ -9,11 +10,16 @@ sys.stdout.reconfigure(encoding='utf-8')
 WORKSPACE = "slttest1"  # Replace with your workspace
 REPO_SLUG = "test1"     # Replace with your repository slug
 ACCESS_TOKEN = "ATCTT3xFfGN0CFPRsEATPT8GgX-PamvnKrGFjqXKyCC8ZN0ZI2pnsBUS7-7J0Ig1dposHf6UOsHabOffY360mK3z3kOu7iVd0RZxX94s_UK0KqJGO2oGj-ijJChO_c234MsA_0dBNmCInQuS_NSjFb9x83buMcJMCtqbCylR0iGHU5vuH_Ba_9g=676CC7D2"  # Replace with your token
-USER_EMAIL = "2021t01245@stu.cmb.ac.lk"  # Replace with the user's email
+USER_EMAIL = "sewminiweerakkody1004@gmail.com"  # Replace with the user's email
 
-# Together AI API details
-API_KEY = "bdc41d8567888349149e521dfb8351ce46323cbe5b28282ce32b9e13c574f8d3"  # Replace with your actual Together AI API key
-MODEL = "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free"  # Use an available model
+# OpenRouter API details
+OPENROUTER_API_KEY = "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"  # Replace with your OpenRouter API key
+
+# Initialize OpenAI client for OpenRouter
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=OPENROUTER_API_KEY,
+)
 
 # Function to fetch commit data from Bitbucket
 def get_commit_data():
@@ -69,7 +75,7 @@ def get_commit_data():
         print("Error fetching commits:", response.status_code, response.text)
         return None
 
-# Function to send commit data to Together AI API
+# Function to send commit data to OpenRouter API
 def analyze_commits_with_llm(commit_data):
     if not commit_data:
         print("No commit data available.")
@@ -77,24 +83,20 @@ def analyze_commits_with_llm(commit_data):
 
     # Construct the prompt with both commits
     prompt = """  
-Evaluate the developer's performance based **only on their last commit** (ignore security practices like hardcoded keys). Focus on:  
+Evaluate the developer's performance based **only on their last commit**. Focus on:  
 
 1. **Code Impact**:  
-   - Ratio of meaningful code (e.g., logic, features) vs. trivial changes (comments, whitespace).  
-   - Efficiency: Fewer lines with high impact is a plus.  
+   - Are the changes meaningful (e.g., new features, bug fixes, logic improvements)?  
+   - Is the ratio of meaningful changes high compared to trivial changes (e.g., whitespace, formatting)?  
+   - Fewer lines of code with high impact is a plus.  
 
- 
-
-3. **Time Efficiency**:  
-   - If the time taken is unusually long for the scope of work, note it.  
-
-4. **Potential Misleading Behavior**:  
-   - Flag if the commit inflates activity (e.g., minor formatting to show progress).  
+2. **Time Efficiency**:  
+   - Compare the time taken for the work to the expected time for similar tasks.  
+   - If the developer took significantly longer than expected (e.g., 2 weeks for 2 days of work), note it as a concern.  
 
 **Output Format**:  
 - Performance: [Average/Below Average/Above Average]  
 - Summary: One sentence highlighting a **specific strength/weakness** in their work.  
- 
 """  
     for commit in commit_data:
         prompt += f"Commit Hash: {commit['commit_hash']}\n"
@@ -105,29 +107,25 @@ Evaluate the developer's performance based **only on their last commit** (ignore
         prompt += "Removed Code:\n"
         prompt += "\n".join(commit['code_changes']['removed']) + "\n\n"
 
-    # Create the payload for the Together AI API
-    payload = {
-        "model": MODEL,
-        "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": 4000,  # Increase token limit
-        "temperature": 0.7  # Optional: Adjust creativity (0.7 is balanced)
-    }
-
-    # Send request to Together AI API
-    response = requests.post(
-        "https://api.together.xyz/v1/chat/completions",
-        headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
-        json=payload
+    # Send request to OpenRouter API
+    response = client.chat.completions.create(
+        model="deepseek/deepseek-r1:free",  # Use DeepSeek model via OpenRouter
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=4000,  # Adjust as needed
+        temperature=0.3,  # Lower for more focused responses
+        extra_headers={
+            "HTTP-Referer": "<YOUR_SITE_URL>",  # Optional. Site URL for rankings on openrouter.ai.
+            "X-Title": "<YOUR_SITE_NAME>",  # Optional. Site title for rankings on openrouter.ai.
+        },
     )
 
     # Print the response
-    if response.status_code == 200:
+    if response.choices:
         print("✅ API is working! Full Response:")
-        print(response.json()["choices"][0]["message"]["content"])
+        print(response.choices[0].message.content)
     else:
         print("❌ API request failed!")
-        print("Status Code:", response.status_code)
-        print("Response:", response.text)
+        print("Response:", response)
 
 # Main execution
 if __name__ == "__main__":
