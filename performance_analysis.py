@@ -77,6 +77,61 @@ def get_commit_data():
         return None
 
 
+# **Duplicated Function Without Modifications**
+def get_commit_data_copy():
+    API_URL = f"https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{REPO_SLUG}/commits?pagelen=2&author={USER_EMAIL}"
+    headers = {"Authorization": f"Bearer {BITBUCKET_ACCESS_TOKEN}"}  # Updated variable name
+
+    # Fetch commits
+    response = requests.get(API_URL, headers=headers)
+
+    if response.status_code == 200:
+        commits = response.json()["values"]
+        commit_data = []
+
+        for commit in commits:
+            commit_hash = commit["hash"]
+            date = commit["date"]
+            message = commit["message"]
+
+            # Get raw diff content
+            raw_diff_url = f"https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{REPO_SLUG}/diff/{commit_hash}"
+            raw_diff_response = requests.get(raw_diff_url, headers=headers)
+
+            added_code = []
+            removed_code = []
+
+            if raw_diff_response.status_code == 200:
+                # Parse diff to get changed lines
+                diff_content = raw_diff_response.text
+                for line in diff_content.split('\n'):
+                    # Skip diff headers
+                    if line.startswith('+++') or line.startswith('---'):
+                        continue
+                    # Capture added lines
+                    if line.startswith('+'):
+                        added_code.append(line[1:])  # Remove '+' prefix
+                    # Capture removed lines
+                    elif line.startswith('-'):
+                        removed_code.append(line[1:])  # Remove '-' prefix
+
+            # Collect commit data
+            commit_data.append({
+                "commit_hash": commit_hash,
+                "date": date,
+                "message": message,
+                "code_changes": {
+                    "added": added_code,
+                    "removed": removed_code
+                }
+            })
+
+        return commit_data
+    else:
+        print("Error fetching commits:", response.status_code, response.text)
+        return None
+
+
 # Function to send commit data to OpenRouter API
 def analyze_commits_with_llm(commit_data):
     if not commit_data:
