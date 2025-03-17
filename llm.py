@@ -4,7 +4,7 @@ import requests
 # Set the console encoding to UTF-8
 sys.stdout.reconfigure(encoding='utf-8')
 
-API_KEY = "bdc41d8567888349149e521dfb8351ce46323cbe5b28282ce32b9e13c574f8d3"  # Replace with your actual Together AI API key
+API_KEY = "169246bd3a0e50fcb508380fb3da5d1c121b71aac4f21d8baad8d01111d8f59f"  # Replace with your actual Together AI API key
 MODEL = "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free"  # Use an available model
 
 # Create a simple test request
