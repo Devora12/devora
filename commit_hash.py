@@ -2,6 +2,7 @@ import sys
 import requests
 import json
 from openai import OpenAI
+from concurrent.futures import ThreadPoolExecutor
 
 # Set the console encoding to UTF-8
 sys.stdout.reconfigure(encoding='utf-8')
@@ -15,58 +16,57 @@ USER_EMAIL = "sewminiweerakkody1004@gmail.com"  # Replace with the user's email
 
 OPENROUTER_API_KEY = "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"  # Replace with your OpenRouter API key
 
-# Initialize OpenAI client for OpenRouter
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=OPENROUTER_API_KEY,
 )
 
+def fetch_data(url, headers):
+    """Helper function to fetch data from an API."""
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response
+    else:
+        print(f"Error fetching data from {url}: {response.status_code}, {response.text}")
+        return None
+
 def get_specific_commit_data(commit_hash):
-    """Fetch data for a specific commit hash including its diff"""
+    """Fetch data for a specific commit hash including its diff."""
     API_URL = f"https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{REPO_SLUG}/commit/{commit_hash}"
     headers = {"Authorization": f"Bearer {BITBUCKET_ACCESS_TOKEN}"}
 
-    response = requests.get(API_URL, headers=headers)
-    if response.status_code == 200:
-        commit = response.json()
-        commit_data = []
-        
-        # Get raw diff content
-        raw_diff_url = f"https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{REPO_SLUG}/diff/{commit_hash}"
-        raw_diff_response = requests.get(raw_diff_url, headers=headers)
+    # Fetch commit details and raw diff in parallel
+    with ThreadPoolExecutor() as executor:
+        commit_future = executor.submit(fetch_data, API_URL, headers)
+        raw_diff_future = executor.submit(fetch_data, f"https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{REPO_SLUG}/diff/{commit_hash}", headers)
 
-        added_code = []
-        removed_code = []
+        commit_response = commit_future.result()
+        raw_diff_response = raw_diff_future.result()
 
-        if raw_diff_response.status_code == 200:
-            # Parse diff to get changed lines
-            diff_content = raw_diff_response.text
-            for line in diff_content.split('\n'):
-                # Skip diff headers
-                if line.startswith('+++') or line.startswith('---'):
-                    continue
-                # Capture added lines
-                if line.startswith('+'):
-                    added_code.append(line[1:])  # Remove '+' prefix
-                # Capture removed lines
-                elif line.startswith('-'):
-                    removed_code.append(line[1:])  # Remove '-' prefix
-
-        # Collect commit data
-        commit_data.append({
-            "commit_hash": commit_hash,
-            "date": commit["date"],
-            "message": commit["message"],
-            "code_changes": {
-                "added": added_code,
-                "removed": removed_code
-            }
-        })
-
-        return commit_data
-    else:
-        print("Error fetching commit:", response.status_code, response.text)
+    if not commit_response or not raw_diff_response:
         return None
+
+    commit = commit_response.json()
+    added_code = []
+    removed_code = []
+
+    # Parse diff to get changed lines (limit to first 500 lines)
+    diff_content = raw_diff_response.text.split('\n')[:500]
+    for line in diff_content:
+        if line.startswith('+') and not line.startswith('+++'):
+            added_code.append(line[1:])  # Remove '+' prefix
+        elif line.startswith('-') and not line.startswith('---'):
+            removed_code.append(line[1:])  # Remove '-' prefix
+
+    return [{
+        "commit_hash": commit_hash,
+        "date": commit["date"],
+        "message": commit["message"],
+        "code_changes": {
+            "added": added_code,
+            "removed": removed_code
+        }
+    }]
 
 def analyze_commits_with_llm(commit_data):
     if not commit_data:
@@ -95,9 +95,9 @@ Evaluate the developer's performance based on the following commit. Focus on:
         prompt += f"Date: {commit['date']}\n"
         prompt += f"Message: {commit['message']}\n"
         prompt += "Added Code:\n"
-        prompt += "\n".join(commit['code_changes']['added'][:500]) + "\n"  # Limit to first 500 lines
+        prompt += "\n".join(commit['code_changes']['added']) + "\n"
         prompt += "Removed Code:\n"
-        prompt += "\n".join(commit['code_changes']['removed'][:500]) + "\n"
+        prompt += "\n".join(commit['code_changes']['removed']) + "\n"
 
     # Send request to OpenRouter API
     response = client.chat.completions.create(
