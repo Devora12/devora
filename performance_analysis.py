@@ -10,7 +10,8 @@ sys.stdout.reconfigure(encoding='utf-8')
 WORKSPACE = "slttest1"  # Replace with your workspace
 REPO_SLUG = "test1"     # Replace with your repository slug
 ACCESS_TOKEN = "ATCTT3xFfGN0CFPRsEATPT8GgX-PamvnKrGFjqXKyCC8ZN0ZI2pnsBUS7-7J0Ig1dposHf6UOsHabOffY360mK3z3kOu7iVd0RZxX94s_UK0KqJGO2oGj-ijJChO_c234MsA_0dBNmCInQuS_NSjFb9x83buMcJMCtqbCylR0iGHU5vuH_Ba_9g=676CC7D2"  # Replace with your token
-USER_EMAIL = "2021t01245@stu.cmb.ac.lk"  # Replace with the user's email
+# USER_EMAIL = "2021t01245@stu.cmb.ac.lk"  # Replace with the user's email
+USER_EMAIL = "sewminiweerakkody1004@gmail.com"
 
 # OpenRouter API details
 OPENROUTER_API_KEY = "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"  # Replace with your OpenRouter API key
@@ -92,7 +93,7 @@ Evaluate the developer's performance based **only on their last commit**. Focus 
 
 2. **Time Efficiency**:  
    - Compare the time taken for the work to the expected time for similar tasks.  
-   - If the developer took significantly longer than expected (e.g., 2 weeks for 2 days of work), note it as a concern.  
+   - If the developer took significantly longer than expected (e.g., 2 weeks for 2 days of work), note it as a concern and prioratize this when given user performance.  
 
 **Output Format**:  
 - Performance: [Average/Below Average/Above Average]  
@@ -112,7 +113,7 @@ Evaluate the developer's performance based **only on their last commit**. Focus 
         model="deepseek/deepseek-r1:free",  # Use DeepSeek model via OpenRouter
         messages=[{"role": "user", "content": prompt}],
         max_tokens=4000,  # Adjust as needed
-        temperature=0.3,  # Lower for more focused responses
+        temperature=0.1,  # Lower for more focused responses
         extra_headers={
             "HTTP-Referer": "<YOUR_SITE_URL>",  # Optional. Site URL for rankings on openrouter.ai.
             "X-Title": "<YOUR_SITE_NAME>",  # Optional. Site title for rankings on openrouter.ai.
