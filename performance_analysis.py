@@ -149,7 +149,7 @@ Evaluate the developer's performance based **only on their last commit**. Focus 
 
 2. **Time Efficiency**:  
    - Compare the time taken for the work to the expected time for similar tasks.  
-   - If the developer took significantly longer than expected (e.g., 2 weeks for 2 days of work), note it as a concern.  
+   - If the developer took significantly longer than expected (e.g., 2 weeks for 2 days of work), note it as a concern and prioratize this when given user performance.  
 
 **Output Format**:  
 - Performance: [Average/Below Average/Above Average]  
@@ -170,7 +170,7 @@ Evaluate the developer's performance based **only on their last commit**. Focus 
         model="deepseek/deepseek-r1:free",  # Use DeepSeek model via OpenRouter
         messages=[{"role": "user", "content": prompt}],
         max_tokens=4000,  # Adjust as needed
-        temperature=0.3,  # Lower for more focused responses
+        temperature=0.1,  # Lower for more focused responses
         extra_headers={
             "HTTP-Referer": "<YOUR_SITE_URL>",  # Optional. Site URL for rankings on openrouter.ai.
             "X-Title": "<YOUR_SITE_NAME>",  # Optional. Site title for rankings on openrouter.ai.
