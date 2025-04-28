@@ -117,6 +117,7 @@ export default function AnalysisResult({ analysis }) {
             </div>
           </div>
         </div>
+        
       </div>
     )
   }

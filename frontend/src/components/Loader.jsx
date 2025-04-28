@@ -9,6 +9,7 @@ export default function Loader() {
           <div className="w-2 h-8 bg-blue-500 animate-wave [animation-delay:0.4s]" />
         </div>
       </div>
+      
     );
   }
   

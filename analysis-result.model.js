@@ -15,6 +15,7 @@ const analysisResultSchema = new mongoose.Schema({
         codeChanges: Map
       }]
     },
+    
     llmAnalysis: {
       summary_of_change: [String],
       code_complexity: Map,

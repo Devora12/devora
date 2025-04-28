@@ -20,6 +20,7 @@ export default {
         wave: 'wave 1s infinite ease-in-out',
       },
     },
+    
   },
   plugins: [],
 }

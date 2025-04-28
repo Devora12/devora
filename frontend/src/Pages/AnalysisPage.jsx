@@ -54,6 +54,7 @@ export default function AnalysisPage() {
           <AnalysisResult analysis={llmAnalysis} />
         </div>
       </div>
+      
     </div>
   )
 }

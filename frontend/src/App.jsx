@@ -15,5 +15,6 @@ export default function App() {
         <Route path="testcases/:testcaseId/analysis" element={<AnalysisPage />} />
       </Route>
     </Routes>
+    
   )
 }

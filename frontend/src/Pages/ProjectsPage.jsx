@@ -37,6 +37,7 @@ export default function ProjectsPage() {
             <p className="text-gray-600">{project.description}</p>
           </Link>
         ))}
+        
       </div>
     </div>
   )
