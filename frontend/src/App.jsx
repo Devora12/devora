@@ -1,20 +1,59 @@
-import { Route, Routes } from 'react-router-dom'
-import ProjectsPage from './pages/ProjectsPage'
-import ModulesPage from './pages/ModulesPage'
-import TestCasesPage from './pages/TestCasesPage'
-import AnalysisPage from './pages/AnalysisPage'
-import Layout from './components/Layout'
+// App.js
+import React, { useState } from 'react';
+import ProjectSelection from './components/sections/ProjectSelection';
+import ProjectOverview from './components/sections/ProjectOverview';
+import TeamMembersSection from './components/sections/TeamMembersSection';
+import { useProjectData } from './hooks/useProjects';
+import './styles/globals.css';
 
-export default function App() {
+function App() {
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedAuthor, setSelectedAuthor] = useState(null);
+
+  const { authors } = useProjectData(selectedProject?.id);
+
+  const handleProjectSelect = (project) => {
+    setSelectedProject(project);
+    setSelectedAuthor(null); // Reset author when project changes
+  };
+
+  const handleAuthorChange = (e) => {
+    const author = e.target.value;
+    setSelectedAuthor(author || null);
+  };
+
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<ProjectsPage />} />
-        <Route path="projects/:projectId/modules" element={<ModulesPage />} />
-        <Route path="modules/:moduleId/testcases" element={<TestCasesPage />} />
-        <Route path="testcases/:testcaseId/analysis" element={<AnalysisPage />} />
-      </Route>
-    </Routes>
-    
-  )
+    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">
+            Developer Analytics Dashboard
+          </h1>
+        </header>
+
+        {/* Project Selection */}
+        <ProjectSelection
+          selectedProject={selectedProject}
+          onProjectSelect={handleProjectSelect}
+        />
+
+        {/* Project Overview */}
+        {selectedProject && (
+          <ProjectOverview project={selectedProject} />
+        )}
+
+        {/* Team Members Section */}
+        {selectedProject && (
+          <TeamMembersSection
+            authors={authors}
+            selectedAuthor={selectedAuthor}
+            onAuthorChange={handleAuthorChange}
+          />
+        )}
+      </div>
+    </div>
+  );
 }
+
+export default App;
