@@ -1,0 +1,1 @@
+Main.py should runu when testcases status changed to pass. should automate this process under MAin.py
