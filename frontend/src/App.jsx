@@ -4,7 +4,7 @@ import ProjectSelection from './components/sections/ProjectSelection';
 import ProjectOverview from './components/sections/ProjectOverview';
 import TeamMembersSection from './components/sections/TeamMembersSection';
 import { useProjectData } from './hooks/useProjects';
-import '';
+import "./index.css";
 
 function App() {
   const [selectedProject, setSelectedProject] = useState(null);

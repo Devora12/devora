@@ -36,7 +36,13 @@ function TeamTimeMetricsChart({ projectId }) {
       });
   }, [projectId]);
 
-  if (loading) return <p className="text-gray-500">Loading team metrics...</p>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
   if (error) return <p className="text-red-500">{error}</p>;
   if (!teamMetrics || teamMetrics.length === 0) return <p className="text-gray-500">No team time metrics available</p>;
 
