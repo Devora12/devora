@@ -1,0 +1,4 @@
+npm install recharts axios date-fns
+
+npm install -D tailwindcss@3 postcss autoprefixer
+npx tailwindcss init -p
