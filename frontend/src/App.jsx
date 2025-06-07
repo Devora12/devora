@@ -28,7 +28,7 @@ function App() {
         {/* Header */}
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800">
-            Developer Analytics Dashboard a
+            Developer Analytics Dashboard Testing
           </h1>
         </header>
 
