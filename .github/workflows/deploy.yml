@@ -1,32 +1,32 @@
-# .github/workflows/deploy.yml
-
-name: Deploy App
+name: Deploy to Server via SSH
 
 on:
   push:
     branches:
-      - main  # or master, your main branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
+    - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up SSH
+    - name: Setup SSH
       run: |
         mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan 172.167.64.218 >> ~/.ssh/known_hosts
 
-    - name: Deploy via SSH
+    - name: Deploy to Server
       run: |
         ssh ubuntu@172.167.64.218 << 'EOF'
-          git pull origin main
+          cd /home/ubuntu/app
 
+          git pull origin main
+          
           cd frontend
           npm install
           npm run build
