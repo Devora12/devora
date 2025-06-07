@@ -23,16 +23,19 @@ jobs:
     - name: Deploy to Server
       run: |
         ssh ubuntu@172.167.64.218 << 'EOF'
-          cd /home/ubuntu
+          cd /home/ubuntu/devora
 
           git pull origin main
           
+          # Frontend
           cd frontend
           npm install
           npm run build
           pm2 restart frontend
 
-          cd ../backend
-          pip3 install -r install.txt
+          # Backend
+          cd ../server
+          source ../venv/bin/activate
+          pip install -r install.txt
           pm2 restart backend
         EOF
