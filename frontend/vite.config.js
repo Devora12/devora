@@ -8,6 +8,7 @@ export default defineConfig({
     include: /src\/.*\.[jt]sx?$/,
   },
   server: {
+    port: 2002,
     proxy: {
       '/api': {
         target: 'http://20.205.22.95:2001',
