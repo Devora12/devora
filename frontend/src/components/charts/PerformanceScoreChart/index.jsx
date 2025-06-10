@@ -27,7 +27,7 @@ const PerformanceScoreChart = ({ projectId }) => {
   useEffect(() => {
     if (projectId) {
       setLoading(true);
-      fetch(`http://20.205.22.95:5000/api/project/${projectId}/performance-scores`)
+      fetch(`http://20.205.22.95:2001/api/project/${projectId}/performance-scores`)
         .then(response => {
           if (!response.ok) throw new Error('Failed to fetch performance scores');
           return response.json();
