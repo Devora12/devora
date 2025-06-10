@@ -7,7 +7,7 @@ const CommitTimelineChart = ({ projectId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  const API_URL = 'http://20.205.22.95:5000/api'; // Update with your actual API URL
+  const API_URL = 'http://20.205.22.95:2001/api'; // Update with your actual API URL
   const COLORS = ['#4285F4', '#EA4335', '#FBBC05', '#34A853'];
   
   useEffect(() => {
