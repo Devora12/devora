@@ -10,7 +10,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://20.205.22.95:5000',
+        target: 'http://20.205.22.95:2001',
         changeOrigin: true,
       }
     }
