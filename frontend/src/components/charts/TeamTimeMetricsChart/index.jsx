@@ -17,7 +17,7 @@ function TeamTimeMetricsChart({ projectId }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_URL = 'http://20.205.22.95:5000/api';
+  const API_URL = 'http://20.205.22.95:2001/api';
   
   useEffect(() => {
     if (!projectId) return;
